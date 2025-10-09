@@ -1,7 +1,7 @@
-import findItemDelimitationItemAndSetElementLength from './findItemDelimitationItem.js';
-import readSequenceItemsImplicit from './readSequenceElementImplicit.js';
-import readTag from './readTag.js';
-import { isPrivateTag } from './util/util.js';
+import findItemDelimitationItemAndSetElementLength from "./findItemDelimitationItem.js";
+import readSequenceItemsImplicit from "./readSequenceElementImplicit.js";
+import readTag from "./readTag.js";
+import { isPrivateTag } from "./util/util.js";
 
 /**
  * Internal helper functions for for parsing DICOM elements
@@ -9,10 +9,10 @@ import { isPrivateTag } from './util/util.js';
 
 const isSequence = (element, byteStream) => {
   if (element.vr !== undefined) {
-    return (element.vr === 'SQ');
+    return element.vr === "SQ";
   }
 
-  if ((byteStream.position + 4) <= byteStream.byteArray.length) {
+  if (byteStream.position + 4 <= byteStream.byteArray.length) {
     const nextTag = readTag(byteStream);
 
     byteStream.seek(-4);
@@ -21,26 +21,32 @@ const isSequence = (element, byteStream) => {
     // These are the tags that could potentially be found directly after a sequence start tag (the delimiter
     // is found in the case of an empty sequence). This is not 100% safe because a non-sequence item
     // could have data that has these bytes, but this is how to do it without a data dictionary.
-    return (nextTag === 'xfffee000') || (nextTag === 'xfffee0dd');
+    return nextTag === "xfffee000" || nextTag === "xfffee0dd";
   }
 
-  byteStream.warnings.push('eof encountered before finding sequence item tag or sequence delimiter tag in peeking to determine VR');
+  byteStream.warnings.push(
+    "eof encountered before finding sequence item tag or sequence delimiter tag in peeking to determine VR",
+  );
 
   return false;
 };
 
-export default function readDicomElementImplicit (byteStream, untilTag, vrCallback) {
+export default function readDicomElementImplicit(
+  byteStream,
+  untilTag,
+  vrCallback,
+) {
   if (byteStream === undefined) {
-    throw 'dicomParser.readDicomElementImplicit: missing required parameter \'byteStream\'';
+    throw "dicomParser.readDicomElementImplicit: missing required parameter 'byteStream'";
   }
 
   const tag = readTag(byteStream);
 
   const element = {
     tag,
-    vr: (vrCallback !== undefined ? vrCallback(tag) : undefined),
+    vr: vrCallback !== undefined ? vrCallback(tag) : undefined,
     length: byteStream.readUint32(),
-    dataOffset: byteStream.position
+    dataOffset: byteStream.position,
   };
 
   if (element.length === 4294967295) {
@@ -52,7 +58,10 @@ export default function readDicomElementImplicit (byteStream, untilTag, vrCallba
   }
 
   // always parse sequences with undefined lengths, since there's no other way to know how long they are.
-  if (isSequence(element, byteStream) && (!isPrivateTag(element.tag) || element.hadUndefinedLength)) {
+  if (
+    isSequence(element, byteStream) &&
+    (!isPrivateTag(element.tag) || element.hadUndefinedLength)
+  ) {
     // parse the sequence
     readSequenceItemsImplicit(byteStream, element, vrCallback);
 

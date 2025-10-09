@@ -14,16 +14,16 @@
  * @throws error if buffer overread would occur
  * @access private
  */
-export function readFixedString (byteArray, position, length) {
+export function readFixedString(byteArray, position, length) {
   if (length < 0) {
-    throw 'dicomParser.readFixedString - length cannot be less than 0';
+    throw "dicomParser.readFixedString - length cannot be less than 0";
   }
 
   if (position + length > byteArray.length) {
-    throw 'dicomParser.readFixedString: attempt to read past end of buffer';
+    throw "dicomParser.readFixedString: attempt to read past end of buffer";
   }
 
-  var result = '';
+  var result = "";
   var byte;
 
   for (var i = 0; i < length; i++) {

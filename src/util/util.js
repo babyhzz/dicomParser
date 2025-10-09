@@ -27,7 +27,7 @@ const stringVrs = {
   UN: undefined, // dunno
   UR: true,
   US: false,
-  UT: true
+  UT: true,
 };
 
 /**
@@ -46,9 +46,9 @@ const isStringVr = (vr) => stringVrs[vr];
 const isPrivateTag = (tag) => {
   const lastGroupDigit = parseInt(tag[4], 16);
   if (isNaN(lastGroupDigit)) {
-    throw 'dicomParser.isPrivateTag: cannot parse last character of group';
+    throw "dicomParser.isPrivateTag: cannot parse last character of group";
   }
-  const groupIsOdd = (lastGroupDigit % 2) === 1;
+  const groupIsOdd = lastGroupDigit % 2 === 1;
 
   return groupIsOdd;
 };
@@ -63,20 +63,15 @@ const parsePN = (personName) => {
   if (personName === undefined) {
     return undefined;
   }
-  const stringValues = personName.split('^');
-
+  const stringValues = personName.split("^");
 
   return {
     familyName: stringValues[0],
     givenName: stringValues[1],
     middleName: stringValues[2],
     prefix: stringValues[3],
-    suffix: stringValues[4]
+    suffix: stringValues[4],
   };
 };
 
-export {
-  isStringVr,
-  isPrivateTag,
-  parsePN
-};
+export { isStringVr, isPrivateTag, parsePN };

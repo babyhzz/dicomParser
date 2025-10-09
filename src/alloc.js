@@ -4,11 +4,11 @@
  * @param length number of bytes of the Byte Array
  * @returns {object} Uint8Array or Buffer depending on the type of byteArray
  */
-export default function alloc (byteArray, length) {
-  if (typeof Buffer !== 'undefined' && byteArray instanceof Buffer) {
+export default function alloc(byteArray, length) {
+  if (typeof Buffer !== "undefined" && byteArray instanceof Buffer) {
     return Buffer.alloc(length);
   } else if (byteArray instanceof Uint8Array) {
     return new Uint8Array(length);
   }
-  throw 'dicomParser.alloc: unknown type for byteArray';
+  throw "dicomParser.alloc: unknown type for byteArray";
 }

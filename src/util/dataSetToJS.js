@@ -1,24 +1,22 @@
-import explicitElementToString from './elementToString.js';
-import * as util from './util.js';
+import explicitElementToString from "./elementToString.js";
+import * as util from "./util.js";
 
 /**
  * converts an explicit dataSet to a javascript object
  * @param dataSet
  * @param options
  */
-export default function explicitDataSetToJS (dataSet, options) {
+export default function explicitDataSetToJS(dataSet, options) {
   if (dataSet === undefined) {
-    throw 'dicomParser.explicitDataSetToJS: missing required parameter dataSet';
+    throw "dicomParser.explicitDataSetToJS: missing required parameter dataSet";
   }
 
   options = options || {
     omitPrivateAttibutes: true, // true if private elements should be omitted
-    maxElementLength: 128 // maximum element length to try and convert to string format
+    maxElementLength: 128, // maximum element length to try and convert to string format
   };
 
-  var result = {
-
-  };
+  var result = {};
 
   for (var tag in dataSet.elements) {
     var element = dataSet.elements[tag];
@@ -33,7 +31,9 @@ export default function explicitDataSetToJS (dataSet, options) {
       var sequenceItems = [];
 
       for (var i = 0; i < element.items.length; i++) {
-        sequenceItems.push(explicitDataSetToJS(element.items[i].dataSet, options));
+        sequenceItems.push(
+          explicitDataSetToJS(element.items[i].dataSet, options),
+        );
       }
       result[tag] = sequenceItems;
     } else {
@@ -49,7 +49,7 @@ export default function explicitDataSetToJS (dataSet, options) {
       } else {
         result[tag] = {
           dataOffset: element.dataOffset,
-          length: element.length
+          length: element.length,
         };
       }
     }

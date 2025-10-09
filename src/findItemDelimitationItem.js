@@ -8,9 +8,12 @@
  * @param byteStream
  * @param element
  */
-export default function findItemDelimitationItemAndSetElementLength (byteStream, element) {
+export default function findItemDelimitationItemAndSetElementLength(
+  byteStream,
+  element,
+) {
   if (byteStream === undefined) {
-    throw 'dicomParser.readDicomElementImplicit: missing required parameter \'byteStream\'';
+    throw "dicomParser.readDicomElementImplicit: missing required parameter 'byteStream'";
   }
 
   const itemDelimitationItemLength = 8; // group, element, length
@@ -28,7 +31,9 @@ export default function findItemDelimitationItemAndSetElementLength (byteStream,
         const itemDelimiterLength = byteStream.readUint32(); // the length
 
         if (itemDelimiterLength !== 0) {
-          byteStream.warnings(`encountered non zero length following item delimiter at position ${byteStream.position - 4} while reading element of undefined length with tag ${element.tag}`);
+          byteStream.warnings(
+            `encountered non zero length following item delimiter at position ${byteStream.position - 4} while reading element of undefined length with tag ${element.tag}`,
+          );
         }
 
         element.length = byteStream.position - element.dataOffset;

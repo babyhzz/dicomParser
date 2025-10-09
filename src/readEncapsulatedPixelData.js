@@ -1,5 +1,5 @@
-import readEncapsulatedImageFrame from './readEncapsulatedImageFrame.js';
-import readEncapsulatedPixelDataFromFragments from './readEncapsulatedPixelDataFromFragments.js';
+import readEncapsulatedImageFrame from "./readEncapsulatedImageFrame.js";
+import readEncapsulatedPixelDataFromFragments from "./readEncapsulatedPixelDataFromFragments.js";
 
 /**
  * Functionality for extracting encapsulated pixel data
@@ -19,41 +19,47 @@ let deprecatedNoticeLogged = false;
  * @param frame - the zero based frame index
  * @returns {object} with the encapsulated pixel data
  */
-export default function readEncapsulatedPixelData (dataSet, pixelDataElement, frame) {
+export default function readEncapsulatedPixelData(
+  dataSet,
+  pixelDataElement,
+  frame,
+) {
   if (!deprecatedNoticeLogged) {
     deprecatedNoticeLogged = true;
 
     if (console && console.log) {
-      console.log('WARNING: dicomParser.readEncapsulatedPixelData() has been deprecated');
+      console.log(
+        "WARNING: dicomParser.readEncapsulatedPixelData() has been deprecated",
+      );
     }
   }
 
   if (dataSet === undefined) {
-    throw 'dicomParser.readEncapsulatedPixelData: missing required parameter \'dataSet\'';
+    throw "dicomParser.readEncapsulatedPixelData: missing required parameter 'dataSet'";
   }
   if (pixelDataElement === undefined) {
-    throw 'dicomParser.readEncapsulatedPixelData: missing required parameter \'element\'';
+    throw "dicomParser.readEncapsulatedPixelData: missing required parameter 'element'";
   }
   if (frame === undefined) {
-    throw 'dicomParser.readEncapsulatedPixelData: missing required parameter \'frame\'';
+    throw "dicomParser.readEncapsulatedPixelData: missing required parameter 'frame'";
   }
-  if (pixelDataElement.tag !== 'x7fe00010') {
-    throw 'dicomParser.readEncapsulatedPixelData: parameter \'element\' refers to non pixel data tag (expected tag = x7fe00010)';
+  if (pixelDataElement.tag !== "x7fe00010") {
+    throw "dicomParser.readEncapsulatedPixelData: parameter 'element' refers to non pixel data tag (expected tag = x7fe00010)";
   }
   if (pixelDataElement.encapsulatedPixelData !== true) {
-    throw 'dicomParser.readEncapsulatedPixelData: parameter \'element\' refers to pixel data element that does not have encapsulated pixel data';
+    throw "dicomParser.readEncapsulatedPixelData: parameter 'element' refers to pixel data element that does not have encapsulated pixel data";
   }
   if (pixelDataElement.hadUndefinedLength !== true) {
-    throw 'dicomParser.readEncapsulatedPixelData: parameter \'element\' refers to pixel data element that does not have encapsulated pixel data';
+    throw "dicomParser.readEncapsulatedPixelData: parameter 'element' refers to pixel data element that does not have encapsulated pixel data";
   }
   if (pixelDataElement.basicOffsetTable === undefined) {
-    throw 'dicomParser.readEncapsulatedPixelData: parameter \'element\' refers to pixel data element that does not have encapsulated pixel data';
+    throw "dicomParser.readEncapsulatedPixelData: parameter 'element' refers to pixel data element that does not have encapsulated pixel data";
   }
   if (pixelDataElement.fragments === undefined) {
-    throw 'dicomParser.readEncapsulatedPixelData: parameter \'element\' refers to pixel data element that does not have encapsulated pixel data';
+    throw "dicomParser.readEncapsulatedPixelData: parameter 'element' refers to pixel data element that does not have encapsulated pixel data";
   }
   if (frame < 0) {
-    throw 'dicomParser.readEncapsulatedPixelData: parameter \'frame\' must be >= 0';
+    throw "dicomParser.readEncapsulatedPixelData: parameter 'frame' must be >= 0";
   }
 
   // If the basic offset table is not empty, we can extract the frame
@@ -63,5 +69,10 @@ export default function readEncapsulatedPixelData (dataSet, pixelDataElement, fr
 
   // No basic offset table, assume all fragments are for one frame - NOTE that this is NOT a valid
   // assumption but is the original behavior so we are keeping it for now
-  return readEncapsulatedPixelDataFromFragments(dataSet, pixelDataElement, 0, pixelDataElement.fragments.length);
+  return readEncapsulatedPixelDataFromFragments(
+    dataSet,
+    pixelDataElement,
+    0,
+    pixelDataElement.fragments.length,
+  );
 }

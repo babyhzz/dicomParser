@@ -1,4 +1,4 @@
-import readTag from './readTag.js';
+import readTag from "./readTag.js";
 
 /**
  * Internal helper functions for parsing DICOM elements
@@ -12,18 +12,18 @@ import readTag from './readTag.js';
  * @param byteStream the byte
  * @returns {{tag: string, length: integer, dataOffset: integer}}
  */
-export default function readSequenceItem (byteStream) {
+export default function readSequenceItem(byteStream) {
   if (byteStream === undefined) {
-    throw 'dicomParser.readSequenceItem: missing required parameter \'byteStream\'';
+    throw "dicomParser.readSequenceItem: missing required parameter 'byteStream'";
   }
 
   const element = {
     tag: readTag(byteStream),
     length: byteStream.readUint32(),
-    dataOffset: byteStream.position
+    dataOffset: byteStream.position,
   };
 
-  if (element.tag !== 'xfffee000') {
+  if (element.tag !== "xfffee000") {
     throw `dicomParser.readSequenceItem: item tag (FFFE,E000) not found at offset ${byteStream.position}`;
   }
 

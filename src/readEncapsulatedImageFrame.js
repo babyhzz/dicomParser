@@ -1,4 +1,4 @@
-import readEncapsulatedPixelDataFromFragments from './readEncapsulatedPixelDataFromFragments.js';
+import readEncapsulatedPixelDataFromFragments from "./readEncapsulatedPixelDataFromFragments.js";
 
 /**
  * Functionality for extracting encapsulated pixel data
@@ -12,7 +12,12 @@ const findFragmentIndexWithOffset = (fragments, offset) => {
   }
 };
 
-const calculateNumberOfFragmentsForFrame = (frameIndex, basicOffsetTable, fragments, startFragmentIndex) => {
+const calculateNumberOfFragmentsForFrame = (
+  frameIndex,
+  basicOffsetTable,
+  fragments,
+  startFragmentIndex,
+) => {
   // special case for last frame
   if (frameIndex === basicOffsetTable.length - 1) {
     return fragments.length - startFragmentIndex;
@@ -27,7 +32,7 @@ const calculateNumberOfFragmentsForFrame = (frameIndex, basicOffsetTable, fragme
     }
   }
 
-  throw 'dicomParser.calculateNumberOfFragmentsForFrame: could not find fragment with offset matching basic offset table';
+  throw "dicomParser.calculateNumberOfFragmentsForFrame: could not find fragment with offset matching basic offset table";
 };
 
 /**
@@ -44,44 +49,50 @@ const calculateNumberOfFragmentsForFrame = (frameIndex, basicOffsetTable, fragme
  * @param [fragments] - optional array of objects describing each fragment (offset, position, length)
  * @returns {object} with the encapsulated pixel data
  */
-export default function readEncapsulatedImageFrame (dataSet, pixelDataElement, frameIndex, basicOffsetTable, fragments) {
+export default function readEncapsulatedImageFrame(
+  dataSet,
+  pixelDataElement,
+  frameIndex,
+  basicOffsetTable,
+  fragments,
+) {
   // default parameters
   basicOffsetTable = basicOffsetTable || pixelDataElement.basicOffsetTable;
   fragments = fragments || pixelDataElement.fragments;
 
   // Validate parameters
   if (dataSet === undefined) {
-    throw 'dicomParser.readEncapsulatedImageFrame: missing required parameter \'dataSet\'';
+    throw "dicomParser.readEncapsulatedImageFrame: missing required parameter 'dataSet'";
   }
   if (pixelDataElement === undefined) {
-    throw 'dicomParser.readEncapsulatedImageFrame: missing required parameter \'pixelDataElement\'';
+    throw "dicomParser.readEncapsulatedImageFrame: missing required parameter 'pixelDataElement'";
   }
   if (frameIndex === undefined) {
-    throw 'dicomParser.readEncapsulatedImageFrame: missing required parameter \'frameIndex\'';
+    throw "dicomParser.readEncapsulatedImageFrame: missing required parameter 'frameIndex'";
   }
   if (basicOffsetTable === undefined) {
-    throw 'dicomParser.readEncapsulatedImageFrame: parameter \'pixelDataElement\' does not have basicOffsetTable';
+    throw "dicomParser.readEncapsulatedImageFrame: parameter 'pixelDataElement' does not have basicOffsetTable";
   }
-  if (pixelDataElement.tag !== 'x7fe00010') {
-    throw 'dicomParser.readEncapsulatedImageFrame: parameter \'pixelDataElement\' refers to non pixel data tag (expected tag = x7fe00010)';
+  if (pixelDataElement.tag !== "x7fe00010") {
+    throw "dicomParser.readEncapsulatedImageFrame: parameter 'pixelDataElement' refers to non pixel data tag (expected tag = x7fe00010)";
   }
   if (pixelDataElement.encapsulatedPixelData !== true) {
-    throw 'dicomParser.readEncapsulatedImageFrame: parameter \'pixelDataElement\' refers to pixel data element that does not have encapsulated pixel data';
+    throw "dicomParser.readEncapsulatedImageFrame: parameter 'pixelDataElement' refers to pixel data element that does not have encapsulated pixel data";
   }
   if (pixelDataElement.hadUndefinedLength !== true) {
-    throw 'dicomParser.readEncapsulatedImageFrame: parameter \'pixelDataElement\' refers to pixel data element that does not have undefined length';
+    throw "dicomParser.readEncapsulatedImageFrame: parameter 'pixelDataElement' refers to pixel data element that does not have undefined length";
   }
   if (pixelDataElement.fragments === undefined) {
-    throw 'dicomParser.readEncapsulatedImageFrame: parameter \'pixelDataElement\' refers to pixel data element that does not have fragments';
+    throw "dicomParser.readEncapsulatedImageFrame: parameter 'pixelDataElement' refers to pixel data element that does not have fragments";
   }
   if (basicOffsetTable.length === 0) {
-    throw 'dicomParser.readEncapsulatedImageFrame: basicOffsetTable has zero entries';
+    throw "dicomParser.readEncapsulatedImageFrame: basicOffsetTable has zero entries";
   }
   if (frameIndex < 0) {
-    throw 'dicomParser.readEncapsulatedImageFrame: parameter \'frameIndex\' must be >= 0';
+    throw "dicomParser.readEncapsulatedImageFrame: parameter 'frameIndex' must be >= 0";
   }
   if (frameIndex >= basicOffsetTable.length) {
-    throw 'dicomParser.readEncapsulatedImageFrame: parameter \'frameIndex\' must be < basicOffsetTable.length';
+    throw "dicomParser.readEncapsulatedImageFrame: parameter 'frameIndex' must be < basicOffsetTable.length";
   }
 
   // find starting fragment based on the offset for the frame in the basic offset table
@@ -89,12 +100,23 @@ export default function readEncapsulatedImageFrame (dataSet, pixelDataElement, f
   const startFragmentIndex = findFragmentIndexWithOffset(fragments, offset);
 
   if (startFragmentIndex === undefined) {
-    throw 'dicomParser.readEncapsulatedImageFrame: unable to find fragment that matches basic offset table entry';
+    throw "dicomParser.readEncapsulatedImageFrame: unable to find fragment that matches basic offset table entry";
   }
 
   // calculate the number of fragments for this frame
-  const numFragments = calculateNumberOfFragmentsForFrame(frameIndex, basicOffsetTable, fragments, startFragmentIndex);
+  const numFragments = calculateNumberOfFragmentsForFrame(
+    frameIndex,
+    basicOffsetTable,
+    fragments,
+    startFragmentIndex,
+  );
 
   // now extract the frame from the fragments
-  return readEncapsulatedPixelDataFromFragments(dataSet, pixelDataElement, startFragmentIndex, numFragments, fragments);
+  return readEncapsulatedPixelDataFromFragments(
+    dataSet,
+    pixelDataElement,
+    startFragmentIndex,
+    numFragments,
+    fragments,
+  );
 }

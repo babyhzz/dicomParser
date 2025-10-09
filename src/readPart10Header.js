@@ -1,7 +1,7 @@
-import ByteStream from './byteStream.js';
-import DataSet from './dataSet.js';
-import littleEndianByteArrayParser from './littleEndianByteArrayParser.js';
-import readDicomElementExplicit from './readDicomElementExplicit.js';
+import ByteStream from "./byteStream.js";
+import DataSet from "./dataSet.js";
+import littleEndianByteArrayParser from "./littleEndianByteArrayParser.js";
+import readDicomElementExplicit from "./readDicomElementExplicit.js";
 
 /**
  * Parses a DICOM P10 byte array and returns a DataSet object with the parsed elements.  If the options
@@ -17,13 +17,16 @@ import readDicomElementExplicit from './readDicomElementExplicit.js';
  *         elements successfully parsed before the error.
  */
 
-export default function readPart10Header (byteArray, options = {}) {
+export default function readPart10Header(byteArray, options = {}) {
   if (byteArray === undefined) {
-    throw 'dicomParser.readPart10Header: missing required parameter \'byteArray\'';
+    throw "dicomParser.readPart10Header: missing required parameter 'byteArray'";
   }
 
   const { TransferSyntaxUID } = options;
-  const littleEndianByteStream = new ByteStream(littleEndianByteArrayParser, byteArray);
+  const littleEndianByteStream = new ByteStream(
+    littleEndianByteArrayParser,
+    byteArray,
+  );
 
   function readPrefix() {
     if (littleEndianByteStream.getSize() <= 132 && TransferSyntaxUID) {
@@ -32,10 +35,10 @@ export default function readPart10Header (byteArray, options = {}) {
     littleEndianByteStream.seek(128);
     const prefix = littleEndianByteStream.readFixedString(4);
 
-    if (prefix !== 'DICM') {
+    if (prefix !== "DICM") {
       const { TransferSyntaxUID } = options || {};
       if (!TransferSyntaxUID) {
-        throw 'dicomParser.readPart10Header: DICM prefix not found at location 132 - this is not a valid DICOM P10 file.';
+        throw "dicomParser.readPart10Header: DICM prefix not found at location 132 - this is not a valid DICOM P10 file.";
       }
       littleEndianByteStream.seek(0);
       return false;
@@ -55,18 +58,25 @@ export default function readPart10Header (byteArray, options = {}) {
     if (!isPart10) {
       littleEndianByteStream.position = 0;
       const metaHeaderDataSet = {
-        elements: { x00020010: { tag: 'x00020010', vr: 'UI', Value: TransferSyntaxUID } },
+        elements: {
+          x00020010: { tag: "x00020010", vr: "UI", Value: TransferSyntaxUID },
+        },
         warnings,
       };
       // console.log('Returning metaHeaderDataSet', metaHeaderDataSet);
       return metaHeaderDataSet;
     }
 
-    while (littleEndianByteStream.position < littleEndianByteStream.byteArray.length) {
+    while (
+      littleEndianByteStream.position < littleEndianByteStream.byteArray.length
+    ) {
       const position = littleEndianByteStream.position;
-      const element = readDicomElementExplicit(littleEndianByteStream, warnings);
+      const element = readDicomElementExplicit(
+        littleEndianByteStream,
+        warnings,
+      );
 
-      if (element.tag > 'x0002ffff') {
+      if (element.tag > "x0002ffff") {
         littleEndianByteStream.position = position;
         break;
       }
@@ -76,7 +86,11 @@ export default function readPart10Header (byteArray, options = {}) {
       elements[element.tag] = element;
     }
 
-    const metaHeaderDataSet = new DataSet(littleEndianByteStream.byteArrayParser, littleEndianByteStream.byteArray, elements);
+    const metaHeaderDataSet = new DataSet(
+      littleEndianByteStream.byteArrayParser,
+      littleEndianByteStream.byteArray,
+      elements,
+    );
 
     metaHeaderDataSet.warnings = littleEndianByteStream.warnings;
     metaHeaderDataSet.position = littleEndianByteStream.position;

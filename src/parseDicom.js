@@ -1,22 +1,22 @@
-import alloc from './alloc.js';
-import bigEndianByteArrayParser from './bigEndianByteArrayParser.js';
-import ByteStream from './byteStream.js';
-import DataSet from './dataSet.js';
-import littleEndianByteArrayParser from './littleEndianByteArrayParser.js';
-import readPart10Header from './readPart10Header.js';
-import sharedCopy from './sharedCopy.js';
-import * as byteArrayParser from './byteArrayParser.js';
-import * as parseDicomDataSet from './parseDicomDataSet.js';
+import alloc from "./alloc.js";
+import bigEndianByteArrayParser from "./bigEndianByteArrayParser.js";
+import ByteStream from "./byteStream.js";
+import DataSet from "./dataSet.js";
+import littleEndianByteArrayParser from "./littleEndianByteArrayParser.js";
+import readPart10Header from "./readPart10Header.js";
+import sharedCopy from "./sharedCopy.js";
+import * as byteArrayParser from "./byteArrayParser.js";
+import * as parseDicomDataSet from "./parseDicomDataSet.js";
 
 // LEE (Little Endian Explicit) is the transfer syntax used in dimse operations when there is a split
 // between the header and data.
-const LEE = '1.2.840.10008.1.2.1';
+const LEE = "1.2.840.10008.1.2.1";
 
 // LEI (Little Endian Implicit) is the transfer syntax in raw files
-const LEI = '1.2.840.10008.1.2';
+const LEI = "1.2.840.10008.1.2";
 
 // BEI (Big Endian Implicit) is deprecated, but needs special parse handling
-const BEI = '1.2.840.10008.1.2.2';
+const BEI = "1.2.840.10008.1.2.2";
 
 /**
  * Parses a DICOM P10 byte array and returns a DataSet object with the parsed elements.
@@ -32,23 +32,32 @@ const BEI = '1.2.840.10008.1.2.2';
 
 export default function parseDicom(byteArray, options = {}) {
   if (byteArray === undefined) {
-    throw new Error('dicomParser.parseDicom: missing required parameter \'byteArray\'');
+    throw new Error(
+      "dicomParser.parseDicom: missing required parameter 'byteArray'",
+    );
   }
 
-  
   const readTransferSyntax = (metaHeaderDataSet) => {
     if (metaHeaderDataSet.elements.x00020010 === undefined) {
-      throw new Error('dicomParser.parseDicom: missing required meta header attribute 0002,0010');
+      throw new Error(
+        "dicomParser.parseDicom: missing required meta header attribute 0002,0010",
+      );
     }
 
     const transferSyntaxElement = metaHeaderDataSet.elements.x00020010;
-    return transferSyntaxElement && transferSyntaxElement.Value ||
-      byteArrayParser.readFixedString(byteArray, transferSyntaxElement.dataOffset, transferSyntaxElement.length);
-  }
+    return (
+      (transferSyntaxElement && transferSyntaxElement.Value) ||
+      byteArrayParser.readFixedString(
+        byteArray,
+        transferSyntaxElement.dataOffset,
+        transferSyntaxElement.length,
+      )
+    );
+  };
 
   function isExplicit(transferSyntax) {
     // implicit little endian
-    if (transferSyntax === '1.2.840.10008.1.2') {
+    if (transferSyntax === "1.2.840.10008.1.2") {
       return false;
     }
 
@@ -58,34 +67,52 @@ export default function parseDicom(byteArray, options = {}) {
 
   function getDataSetByteStream(transferSyntax, position) {
     // Detect whether we are inside a browser or Node.js
-    const isNode = (Object.prototype.toString.call(typeof process !== 'undefined' ? process : 0) === '[object process]');
+    const isNode =
+      Object.prototype.toString.call(
+        typeof process !== "undefined" ? process : 0,
+      ) === "[object process]";
 
-    if (transferSyntax === '1.2.840.10008.1.2.1.99') {
+    if (transferSyntax === "1.2.840.10008.1.2.1.99") {
       // if an infalter callback is registered, use it
       if (options && options.inflater) {
         const fullByteArrayCallback = options.inflater(byteArray, position);
 
-        return new ByteStream(littleEndianByteArrayParser, fullByteArrayCallback, 0);
+        return new ByteStream(
+          littleEndianByteArrayParser,
+          fullByteArrayCallback,
+          0,
+        );
       }
       // if running on node, use the zlib library to inflate
       // http://stackoverflow.com/questions/4224606/how-to-check-whether-a-script-is-running-under-node-js
       else if (isNode === true) {
         // inflate it
-        const zlib = require('zlib');
-        const deflatedBuffer = sharedCopy(byteArray, position, byteArray.length - position);
+        const zlib = require("zlib");
+        const deflatedBuffer = sharedCopy(
+          byteArray,
+          position,
+          byteArray.length - position,
+        );
         const inflatedBuffer = zlib.inflateRawSync(deflatedBuffer);
 
         // create a single byte array with the full header bytes and the inflated bytes
-        const fullByteArrayBuffer = alloc(byteArray, inflatedBuffer.length + position);
+        const fullByteArrayBuffer = alloc(
+          byteArray,
+          inflatedBuffer.length + position,
+        );
 
         byteArray.copy(fullByteArrayBuffer, 0, 0, position);
         inflatedBuffer.copy(fullByteArrayBuffer, position);
 
-        return new ByteStream(littleEndianByteArrayParser, fullByteArrayBuffer, 0);
+        return new ByteStream(
+          littleEndianByteArrayParser,
+          fullByteArrayBuffer,
+          0,
+        );
       }
       // if pako is defined - use it.  This is the web browser path
       // https://github.com/nodeca/pako
-      else if (typeof pako !== 'undefined') {
+      else if (typeof pako !== "undefined") {
         // inflate it
         const deflated = byteArray.slice(position);
         const inflated = pako.inflateRaw(deflated);
@@ -100,7 +127,7 @@ export default function parseDicom(byteArray, options = {}) {
       }
 
       // throw exception since no inflater is available
-      throw 'dicomParser.parseDicom: no inflater available to handle deflate transfer syntax';
+      throw "dicomParser.parseDicom: no inflater available to handle deflate transfer syntax";
     }
 
     // explicit big endian
@@ -116,12 +143,15 @@ export default function parseDicom(byteArray, options = {}) {
   function mergeDataSets(metaHeaderDataSet, instanceDataSet) {
     for (const propertyName in metaHeaderDataSet.elements) {
       if (metaHeaderDataSet.elements.hasOwnProperty(propertyName)) {
-        instanceDataSet.elements[propertyName] = metaHeaderDataSet.elements[propertyName];
+        instanceDataSet.elements[propertyName] =
+          metaHeaderDataSet.elements[propertyName];
       }
     }
 
     if (metaHeaderDataSet.warnings !== undefined) {
-      instanceDataSet.warnings = metaHeaderDataSet.warnings.concat(instanceDataSet.warnings);
+      instanceDataSet.warnings = metaHeaderDataSet.warnings.concat(
+        instanceDataSet.warnings,
+      );
     }
 
     return instanceDataSet;
@@ -130,23 +160,40 @@ export default function parseDicom(byteArray, options = {}) {
   function readDataSet(metaHeaderDataSet) {
     const transferSyntax = readTransferSyntax(metaHeaderDataSet);
     const explicit = isExplicit(transferSyntax);
-    const dataSetByteStream = getDataSetByteStream(transferSyntax, metaHeaderDataSet.position);
+    const dataSetByteStream = getDataSetByteStream(
+      transferSyntax,
+      metaHeaderDataSet.position,
+    );
 
     const elements = {};
-    const dataSet = new DataSet(dataSetByteStream.byteArrayParser, dataSetByteStream.byteArray, elements);
+    const dataSet = new DataSet(
+      dataSetByteStream.byteArrayParser,
+      dataSetByteStream.byteArray,
+      elements,
+    );
 
     dataSet.warnings = dataSetByteStream.warnings;
 
     try {
       if (explicit) {
-        parseDicomDataSet.parseDicomDataSetExplicit(dataSet, dataSetByteStream, dataSetByteStream.byteArray.length, options);
+        parseDicomDataSet.parseDicomDataSetExplicit(
+          dataSet,
+          dataSetByteStream,
+          dataSetByteStream.byteArray.length,
+          options,
+        );
       } else {
-        parseDicomDataSet.parseDicomDataSetImplicit(dataSet, dataSetByteStream, dataSetByteStream.byteArray.length, options);
+        parseDicomDataSet.parseDicomDataSetImplicit(
+          dataSet,
+          dataSetByteStream,
+          dataSetByteStream.byteArray.length,
+          options,
+        );
       }
     } catch (e) {
       const ex = {
         exception: e,
-        dataSet
+        dataSet,
       };
 
       throw ex;
