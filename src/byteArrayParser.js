@@ -29,8 +29,6 @@ export function readFixedString(byteArray, position, length) {
   for (var i = 0; i < length; i++) {
     byte = byteArray[position + i];
     if (byte === 0) {
-      position += length;
-
       return result;
     }
     result += String.fromCharCode(byte);
