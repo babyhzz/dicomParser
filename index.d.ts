@@ -136,17 +136,6 @@ declare module 'dicom-parser' {
     prefix?: string;
     suffix?: string;
   }
-  export function parseTM(time: string, validate?: boolean): {
-    hours: number;
-    minutes?: number;
-    seconds?: number;
-    fractionalSeconds?: number;
-  }
-  export function parseDA(date: string, validate?: boolean): {
-    year: number;
-    month: number;
-    day: number;
-  }
   export function explicitElementToString(dataSet: DataSet, element: Element): string
   type explicitDataSetToJSType = string | { dataOffset: number, length: number };
   export function explicitDataSetToJS(dataSet: DataSet, options?: { omitPrivateAttibutes: boolean, maxElementLength: number }): explicitDataSetToJSType | explicitDataSetToJSType[]
