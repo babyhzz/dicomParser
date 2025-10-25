@@ -138,7 +138,7 @@ declare module 'dicom-parser' {
   }
   export function explicitElementToString(dataSet: DataSet, element: Element): string
   type explicitDataSetToJSType = string | { dataOffset: number, length: number };
-  export function explicitDataSetToJS(dataSet: DataSet, options?: { omitPrivateAttibutes: boolean, maxElementLength: number }): explicitDataSetToJSType | explicitDataSetToJSType[]
+  export function explicitDataSetToJS(dataSet: DataSet, options?: { omitPrivateAttributes: boolean, maxElementLength: number }): explicitDataSetToJSType | explicitDataSetToJSType[]
   export function createJPEGBasicOffsetTable(dataSet: DataSet, pixelDataElement: Element, fragments?: Fragment[]): number[];
   export function parseDicomDataSetExplicit(dataSet: DataSet, byteStream: ByteStream, maxPosition?: number, options?: { untilTag: string }): void
   type vrCallback = (tag: string) => string;
