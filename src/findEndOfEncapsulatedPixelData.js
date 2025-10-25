@@ -34,8 +34,8 @@ export default function findEndOfEncapsulatedElement(
     throw "dicomParser.findEndOfEncapsulatedElement: basic offset table not found";
   }
 
-  const basicOffsetTableItemlength = byteStream.readUint32();
-  const numFragments = basicOffsetTableItemlength / 4;
+  const basicOffsetTableItemLength = byteStream.readUint32();
+  const numFragments = basicOffsetTableItemLength / 4;
 
   // Bad idea to not include the basic offset table, as it means writing the data out is inconsistent with reading it
   // but leave this for now.  To fix later.
