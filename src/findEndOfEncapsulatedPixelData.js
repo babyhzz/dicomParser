@@ -11,11 +11,7 @@ import readTag from "./readTag.js";
  * @param byteStream
  * @param element
  */
-export default function findEndOfEncapsulatedElement(
-  byteStream,
-  element,
-  warnings,
-) {
+export default function findEndOfEncapsulatedElement(byteStream, element, warnings) {
   if (byteStream === undefined) {
     throw "dicomParser.findEndOfEncapsulatedElement: missing required parameter 'byteStream'";
   }
@@ -62,11 +58,11 @@ export default function findEndOfEncapsulatedElement(
         position: byteStream.position,
         length,
       });
+
+      byteStream.seek(length);
     } else {
       if (warnings) {
-        warnings.push(
-          `unexpected tag ${tag} while searching for end of pixel data element with undefined length`,
-        );
+        warnings.push(`unexpected tag ${tag} while searching for end of pixel data element with undefined length`);
       }
 
       if (length > byteStream.byteArray.length - byteStream.position) {
@@ -85,13 +81,9 @@ export default function findEndOfEncapsulatedElement(
 
       return;
     }
-
-    byteStream.seek(length);
   }
 
   if (warnings) {
-    warnings.push(
-      `pixel data element ${element.tag} missing sequence delimiter tag xfffee0dd`,
-    );
+    warnings.push(`pixel data element ${element.tag} missing sequence delimiter tag xfffee0dd`);
   }
 }
