@@ -129,13 +129,6 @@ declare module 'dicom-parser' {
 
   export function isStringVr(vr: string): boolean
   export function isPrivateTag(tag: string): boolean
-  export function parsePN(personName: string): {
-    familyName?: string;
-    givenName?: string;
-    middleName?: string;
-    prefix?: string;
-    suffix?: string;
-  }
   export function explicitElementToString(dataSet: DataSet, element: Element): string
   type explicitDataSetToJSType = string | { dataOffset: number, length: number };
   export function explicitDataSetToJS(dataSet: DataSet, options?: { omitPrivateAttributes: boolean, maxElementLength: number }): explicitDataSetToJSType | explicitDataSetToJSType[]
