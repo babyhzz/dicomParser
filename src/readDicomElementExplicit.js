@@ -55,7 +55,7 @@ export default function readDicomElementExplicit(
     element.dataOffset = byteStream.position;
   }
 
-  if (element.length === 4294967295) {
+  if (element.length === 0xffffffff) {
     element.hadUndefinedLength = true;
   }
 
@@ -70,7 +70,7 @@ export default function readDicomElementExplicit(
     return element;
   }
 
-  if (element.length === 4294967295) {
+  if (element.length === 0xffffffff) {
     if (element.tag === "x7fe00010") {
       findEndOfEncapsulatedElement(byteStream, element, warnings);
 

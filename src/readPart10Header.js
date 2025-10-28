@@ -40,7 +40,6 @@ export default function readPart10Header(byteArray, options = {}) {
       if (!TransferSyntaxUID) {
         throw "dicomParser.readPart10Header: DICM prefix not found at location 132 - this is not a valid DICOM P10 file.";
       }
-      littleEndianByteStream.seek(0);
       return false;
     }
     return true;

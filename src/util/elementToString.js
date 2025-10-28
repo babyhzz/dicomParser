@@ -24,7 +24,7 @@ export default function explicitElementToString(dataSet, element) {
 
     for (var i = 0; i < numItems; i++) {
       if (i !== 0) {
-        result += "/";
+        result += "\\";
       }
       result += func.call(dataSet, tag, i).toString();
     }

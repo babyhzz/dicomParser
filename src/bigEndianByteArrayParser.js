@@ -20,7 +20,7 @@ export default {
       throw "bigEndianByteArrayParser.readUint16: attempt to read past end of buffer";
     }
 
-    return (byteArray[position] << 8) + byteArray[position + 1];
+    return byteArray[position] * 256 + byteArray[position + 1];
   },
 
   /**
@@ -68,13 +68,12 @@ export default {
       throw "bigEndianByteArrayParser.readUint32: attempt to read past end of buffer";
     }
 
-    var uint32 =
-      256 *
-        (256 * (256 * byteArray[position] + byteArray[position + 1]) +
-          byteArray[position + 2]) +
-      byteArray[position + 3];
-
-    return uint32;
+    return (
+      byteArray[position + 3] +
+      byteArray[position + 2] * 256 +
+      byteArray[position + 1] * 256 * 256 +
+      byteArray[position + 0] * 256 * 256 * 256
+    );
   },
 
   /**

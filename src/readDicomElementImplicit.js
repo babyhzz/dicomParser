@@ -49,7 +49,7 @@ export default function readDicomElementImplicit(
     dataOffset: byteStream.position,
   };
 
-  if (element.length === 4294967295) {
+  if (element.length === 0xffffffff) {
     element.hadUndefinedLength = true;
   }
 

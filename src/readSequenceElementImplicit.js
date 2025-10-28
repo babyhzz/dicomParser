@@ -42,7 +42,7 @@ function readDicomDataSetImplicitUndefinedLength(byteStream, vrCallback) {
 function readSequenceItemImplicit(byteStream, vrCallback) {
   const item = readSequenceItem(byteStream);
 
-  if (item.length === 4294967295) {
+  if (item.length === 0xffffffff) {
     item.hadUndefinedLength = true;
     item.dataSet = readDicomDataSetImplicitUndefinedLength(
       byteStream,
@@ -123,7 +123,7 @@ export default function readSequenceItemsImplicit(
 
   element.items = [];
 
-  if (element.length === 4294967295) {
+  if (element.length === 0xffffffff) {
     readSQElementUndefinedLengthImplicit(byteStream, element, vrCallback);
   } else {
     readSQElementKnownLengthImplicit(byteStream, element, vrCallback);
