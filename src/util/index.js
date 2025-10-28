@@ -1,6 +1,6 @@
 import { isStringVr, isPrivateTag, parseTag, punctuateTag } from "./util.js";
 
-import explicitElementToString from "./elementToString.js";
+import elementToString from "./elementToString.js";
 import explicitDataSetToJS from "./dataSetToJS.js";
 import createJPEGBasicOffsetTable from "./createJPEGBasicOffsetTable.js";
 
@@ -9,7 +9,7 @@ export {
   isPrivateTag,
   parseTag,
   punctuateTag,
-  explicitElementToString,
+  elementToString,
   explicitDataSetToJS,
   createJPEGBasicOffsetTable,
 };

@@ -1,4 +1,4 @@
-import explicitElementToString from "./elementToString.js";
+import elementToString from "./elementToString.js";
 import * as util from "./util.js";
 
 /**
@@ -41,7 +41,7 @@ export default function explicitDataSetToJS(dataSet, options) {
 
       asString = undefined;
       if (element.length < options.maxElementLength) {
-        asString = explicitElementToString(dataSet, element);
+        asString = elementToString(dataSet, element);
       }
 
       if (asString !== undefined) {

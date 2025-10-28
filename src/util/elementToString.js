@@ -1,4 +1,21 @@
-import * as util from "./util.js";
+import { isStringVr, punctuateTag } from "../util";
+
+
+export default function elementToString(dataSet, element, vr) {
+  if (dataSet === undefined || element === undefined) {
+    throw "dicomParser.elementToString: missing required parameters";
+  }
+
+  if (element.vr === undefined && vr === undefined) {
+    throw "dicomParser.elementToString: cannot convert implicit element to string";
+  }
+
+  if (element.vr === undefined) {
+    element.vr = vr.split("|")[0];
+  }
+
+  return explicitElementToString(dataSet, element);
+}
 
 /**
  * Converts an explicit VR element to a string or undefined if it is not possible to convert.
@@ -7,7 +24,7 @@ import * as util from "./util.js";
  * @param element
  * @returns {*}
  */
-export default function explicitElementToString(dataSet, element) {
+function explicitElementToString(dataSet, element) {
   if (dataSet === undefined || element === undefined) {
     throw "dicomParser.explicitElementToString: missing required parameters";
   }
@@ -32,19 +49,10 @@ export default function explicitElementToString(dataSet, element) {
     return result;
   }
 
-  if (util.isStringVr(vr) === true) {
+  if (isStringVr(vr) === true) {
     textResult = dataSet.string(tag);
   } else if (vr === "AT") {
-    var num = dataSet.uint32(tag);
-
-    if (num === undefined) {
-      return undefined;
-    }
-    if (num < 0) {
-      num = 0xffffffff + num + 1;
-    }
-
-    return `x${num.toString(16).toUpperCase()}`;
+    textResult = punctuateTag(dataSet.attributeTag(tag));
   } else if (vr === "US") {
     textResult = multiElementToString(element.length / 2, dataSet.uint16);
   } else if (vr === "SS") {
@@ -57,6 +65,17 @@ export default function explicitElementToString(dataSet, element) {
     textResult = multiElementToString(element.length / 8, dataSet.double);
   } else if (vr === "FL") {
     textResult = multiElementToString(element.length / 4, dataSet.float);
+  } else if (
+    vr === "OB" ||
+    vr === "OW" ||
+    vr === "OF" ||
+    vr === "OD" ||
+    vr === "OL" ||
+    vr === "OV"
+  ) {
+    textResult = "<binary data>";
+  } else if (vr === "UN") {
+    textResult = "<unknown data>";
   }
 
   return textResult;

@@ -1,7 +1,7 @@
 import {
   isStringVr,
   isPrivateTag,
-  explicitElementToString,
+  elementToString,
   explicitDataSetToJS,
   createJPEGBasicOffsetTable,
 } from "./util/index.js";
@@ -37,7 +37,7 @@ import readTag from "./readTag.js";
 const dicomParser = {
   isStringVr,
   isPrivateTag,
-  explicitElementToString,
+  elementToString,
   explicitDataSetToJS,
   createJPEGBasicOffsetTable,
   parseDicomDataSetExplicit,
@@ -71,7 +71,7 @@ const dicomParser = {
 export {
   isStringVr,
   isPrivateTag,
-  explicitElementToString,
+  elementToString,
   explicitDataSetToJS,
   createJPEGBasicOffsetTable,
   parseDicomDataSetExplicit,
