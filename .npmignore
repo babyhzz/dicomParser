@@ -3,7 +3,6 @@ config/
 coverage/
 documentation/
 examples/
-meteor/
 src/
 test/
 testImages/

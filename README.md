@@ -5,7 +5,7 @@ dicomParser
 ===========
 
 dicomParser is a lightweight library for parsing DICOM P10 byte streams, as well as raw (not encapsulated in part 10) byte streams, in modern HTML5 based web browsers (IE10+),
-Node.js and Meteor.  dicomParser is fast, easy to use and has no required external dependencies.
+Node.js.  dicomParser is fast, easy to use and has no required external dependencies.
 
 Live Examples
 ---------------
@@ -33,10 +33,6 @@ Get a packaged source file:
 Or install via [NPM](https://www.npmjs.com/):
 
 > npm install dicom-parser
-
-Or install via atmosphere for [Meteor](https://www.meteor.com/) applications
-
-> meteor add chafey:dicom-parser
 
 * Note - make sure you install [pako](https://github.com/nodeca/pako) if you need to support
 the Deflated Explicit VR Little Endian transfer syntax
@@ -208,7 +204,7 @@ Future:
 * Add example that allows you to compare two sop instances against each other
 * Figure out how to not have a global dicomParser object when used with an AMD loader
 * See what needs to be done to support different character sets (assumes ASCII currently)
-* Support for parsing from streams on Node.js and Meteor
+* Support for parsing from streams on Node.js
 * Switch to JavaScript ES6
 * Separate the parsing logic from the dataSet creation logic (e.g. parsing generates events
   which dataSet creation logic creates the dataSet from).  Similar concept to SAX parsers.
