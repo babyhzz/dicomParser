@@ -1,6 +1,7 @@
 import {
   isStringVr,
   isPrivateTag,
+  datasetToTree,
   elementToString,
   explicitDataSetToJS,
   createJPEGBasicOffsetTable,
@@ -38,6 +39,7 @@ const dicomParser = {
   isStringVr,
   isPrivateTag,
   elementToString,
+  datasetToTree,
   explicitDataSetToJS,
   createJPEGBasicOffsetTable,
   parseDicomDataSetExplicit,
@@ -72,6 +74,7 @@ export {
   isStringVr,
   isPrivateTag,
   elementToString,
+  datasetToTree,
   explicitDataSetToJS,
   createJPEGBasicOffsetTable,
   parseDicomDataSetExplicit,
