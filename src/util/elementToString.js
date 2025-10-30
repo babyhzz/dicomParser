@@ -1,4 +1,4 @@
-import { isStringVr, punctuateTag } from "../util";
+import { isStringVr, punctuateTag } from "./util";
 
 
 export default function elementToString(dataSet, element, vr) {
@@ -11,7 +11,7 @@ export default function elementToString(dataSet, element, vr) {
   }
 
   if (element.vr === undefined) {
-    element.vr = vr.split("|")[0];
+    element.vr = vr;
   }
 
   return explicitElementToString(dataSet, element);

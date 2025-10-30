@@ -105,4 +105,41 @@ function punctuateTag(tag) {
   return `(${group},${element})`;
 }
 
-export { isStringVr, isPrivateTag, parseTag, punctuateTag };
+/**
+ * 根据 DICOM 标签查找字典定义，支持多种通配符回退策略。
+ * @param {string} tag - DICOM 标签，如 '00100010' 或 '(0010,0010)'
+ * @param {Object} dictionary - DICOM 数据字典
+ * @returns {Object|undefined}
+ */
+function lookupDicomTag(tag, dictionary) {
+    const exactTag = punctuateTag(tag); 
+    const { group, element } = parseDicomTag(tag);
+
+    // 1. 精确匹配
+    if (dictionary[exactTag]) {
+        return dictionary[exactTag];
+    }
+
+    // 2. 组通配: (ggxx,eeee)
+    const groupWildcard = `(${group.substring(0, 2)}xx,${element})`;
+    if (dictionary[groupWildcard]) {
+        return { ...dictionary[groupWildcard], tag: exactTag };
+    }
+
+    // 3. 元素后缀通配: (gggg,xxxe) — 保留 element 最后一位
+    const elementLastChar = element.charAt(3);
+    const elementSuffixWildcard = `(${group},xxx${elementLastChar})`;
+    if (dictionary[elementSuffixWildcard]) {
+        return { ...dictionary[elementSuffixWildcard], tag: exactTag };
+    }
+
+    // 4. 元素全通配: (gggg,xxxx)
+    const elementFullWildcard = `(${group},xxxx)`;
+    if (dictionary[elementFullWildcard]) {
+        return { ...dictionary[elementFullWildcard], tag: exactTag };
+    }
+
+    return undefined;
+}
+
+export { isStringVr, isPrivateTag, parseTag, punctuateTag, lookupDicomTag };

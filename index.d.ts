@@ -131,7 +131,7 @@ declare module 'dicom-parser' {
   export function isPrivateTag(tag: string): boolean
   export function parseDicomTag(tag: string): { group: string, element: string }
   export function punctuateTag(tag: string): string
-  export function explicitElementToString(dataSet: DataSet, element: Element): string
+  export function elementToString(dataSet: DataSet, element: Element): string
   type explicitDataSetToJSType = string | { dataOffset: number, length: number };
   export function explicitDataSetToJS(dataSet: DataSet, options?: { omitPrivateAttributes: boolean, maxElementLength: number }): explicitDataSetToJSType | explicitDataSetToJSType[]
   export function createJPEGBasicOffsetTable(dataSet: DataSet, pixelDataElement: Element, fragments?: Fragment[]): number[];
