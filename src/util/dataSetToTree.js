@@ -1,5 +1,5 @@
 import elementToString from "./elementToString";
-import { lookupDicomTag } from "./util";
+import { lookupDicomTag, punctuateTag } from "./util";
 
 export default function datasetToTree(dataSet, dictionary) {
   const result = [];

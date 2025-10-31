@@ -113,7 +113,7 @@ function punctuateTag(tag) {
  */
 function lookupDicomTag(tag, dictionary) {
     const exactTag = punctuateTag(tag); 
-    const { group, element } = parseDicomTag(tag);
+    const { group, element } = parseTag(tag);
 
     // 1. 精确匹配
     if (dictionary[exactTag]) {
