@@ -638,6 +638,7 @@ function dumpFile()
                 };
 
                 dataSet = dicomParser.parseDicom(byteArray, options);
+                console.log(dicomParser.dataSetToTree(dataSet));
                 // dump dataSet to console to aid debugging.
                 if(console) {
                     console.log(dataSet);
