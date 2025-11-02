@@ -42,10 +42,6 @@ try {
 
 
   if(pixelData.encapsulatedPixelData) {
-    var imageFrame = dicomParser.readEncapsulatedPixelData(dataSet, pixelData, 0);
-    console.log('Old Image Frame length = ', imageFrame.length);
-    console.log('Old Image Frame SHA1 hash = ', sha1(imageFrame));
-
     if(pixelData.basicOffsetTable.length) {
       var imageFrame = dicomParser.readEncapsulatedImageFrame(dataSet, pixelData, 0);
       console.log('Image Frame length = ', imageFrame.length);

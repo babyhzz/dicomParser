@@ -27,7 +27,6 @@ import parseDicom, { LEI, LEE } from "./parseDicom.js";
 import readDicomElementExplicit from "./readDicomElementExplicit.js";
 import readDicomElementImplicit from "./readDicomElementImplicit.js";
 import readEncapsulatedImageFrame from "./readEncapsulatedImageFrame.js";
-import readEncapsulatedPixelData from "./readEncapsulatedPixelData.js";
 import readEncapsulatedPixelDataFromFragments from "./readEncapsulatedPixelDataFromFragments.js";
 import readPart10Header from "./readPart10Header.js";
 import readSequenceItemsExplicit from "./readSequenceElementExplicit.js";
@@ -59,7 +58,6 @@ const dicomParser = {
   readDicomElementExplicit,
   readDicomElementImplicit,
   readEncapsulatedImageFrame,
-  readEncapsulatedPixelData,
   readEncapsulatedPixelDataFromFragments,
   readPart10Header,
   readSequenceItemsExplicit,
@@ -94,7 +92,6 @@ export {
   readDicomElementExplicit,
   readDicomElementImplicit,
   readEncapsulatedImageFrame,
-  readEncapsulatedPixelData,
   readEncapsulatedPixelDataFromFragments,
   readPart10Header,
   readSequenceItemsExplicit,

@@ -150,7 +150,6 @@ declare module 'dicom-parser' {
   export function readDicomElementExplicit(byteStream: ByteStream, warnings?: string[], untilTag?: string): Element
   export function readDicomElementImplicit(byteStream: ByteStream, untilTag?: string, vrCallback?: vrCallback): Element
   export function readEncapsulatedImageFrame(dataSet: DataSet, pixelDataElement: Element, frameIndex: number, basicOffsetTable?: number[], fragments?: Fragment[]): ByteArray
-  export function readEncapsulatedPixelData(dataSet: DataSet, pixelDataElement: Element, frame: number): ByteArray
   export function readEncapsulatedPixelDataFromFragments(dataSet: DataSet, pixelDataElement: Element, startFragmentIndex: number, numFragments?: number, fragments?: Fragment[]): ByteArray
   export function readPart10Header(byteArray: ByteArray, options?: { untilTag: string }): DataSet
   export function readSequenceItemsExplicit(byteStream: ByteStream, element: Element, warnings?: string[]): void

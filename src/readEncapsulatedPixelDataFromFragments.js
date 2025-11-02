@@ -94,7 +94,7 @@ export default function readEncapsulatedPixelDataFromFragments(
   const basicOffsetTable = readSequenceItem(byteStream);
 
   if (basicOffsetTable.tag !== "xfffee000") {
-    throw "dicomParser.readEncapsulatedPixelData: missing basic offset table xfffee000";
+    throw "dicomParser.readEncapsulatedPixelDataFromFragments: missing basic offset table xfffee000";
   }
 
   byteStream.seek(basicOffsetTable.length);
