@@ -2,6 +2,14 @@ import elementToString from "./elementToString";
 import { lookupDicomTag, punctuateTag } from "./util";
 
 export default function datasetToTree(dataSet, dictionary) {
+  if (dataSet === undefined) {
+    throw "dicomParser.dataSetToTree: missing required parameter: dataSet";
+  }
+
+  if (dictionary === undefined) {
+    throw "dicomParser.dataSetToTree: missing required parameter: dictionary";
+  }
+
   const result = [];
 
   const keys = [];
@@ -14,7 +22,7 @@ export default function datasetToTree(dataSet, dictionary) {
     var propertyName = keys[k];
     var element = dataSet.elements[propertyName];
 
-    const tagDefinition = lookupDicomTag(element.tag);
+    const tagDefinition = lookupDicomTag(element.tag, dictionary);
 
     const tagInfo = {
       tag: punctuateTag(element.tag),

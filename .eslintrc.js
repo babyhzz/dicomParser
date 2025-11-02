@@ -24,5 +24,8 @@ module.exports = {
   'rules': {
     'no-constant-condition': 'off',
     'no-prototype-builtins': 'off',
+    "keyword-spacing": "off",
+    'space-in-parens': ['error', 'never'],
+    'space-before-function-paren': ['error', 'never'],
   }
 };
