@@ -14,12 +14,17 @@ function getElementVR(dataSet, element, tagDefinition) {
   let vr = tagDefinition.vr;
 
   if (vr === "OB|OW") {
-    const bitsAllocated = dataSet.uint16("x00280100");
-    vr = bitsAllocated === 8 ? "OB" : "OW";
+    // Pixel Data (7FE0,0010): OB for encapsulated, OB|OW for uncompressed
+    if (element.tag == "x7fe00010" && element.encapsulatedPixelData) {
+      vr = "OB";
+    } else {
+      const bitsAllocated = dataSet.uint16("x00280100") ?? 8;
+      vr = bitsAllocated === 8 ? "OB" : "OW";
+    }
   }
 
   if (vr === "US|SS") {
-    const pixelRepresentation = dataSet.uint16("x00280103");
+    const pixelRepresentation = dataSet.uint16("x00280103") ?? 0;
     vr = pixelRepresentation === 0 ? "US" : "SS";
   }
 
@@ -66,7 +71,7 @@ export function dataSetToTree(dataSet, dictionary) {
   return result;
 }
 
-export function dataSetToObject(dataSet, dictionary) {
+export function dataSetToJson(dataSet, dictionary) {
   if (dataSet === undefined) {
     throw "dicomParser.dataSetToTree: missing required parameter: dataSet";
   }
@@ -85,13 +90,19 @@ export function dataSetToObject(dataSet, dictionary) {
       return;
     }
 
+    // TODO: 有些没有value，如分隔符等，暂时忽略
+
     const propertyName = tagDefinition.name;
     if (element.items) {
       dicomObj[propertyName] = element.items.map((item) =>
-        dataSetToObject(item.dataSet, dictionary)
+        dataSetToJson(item.dataSet, dictionary)
       );
     } else {
-      dicomObj[propertyName] = elementToValue(dataSet, element, tagDefinition.vr);
+      dicomObj[propertyName] = elementToValue(
+        dataSet,
+        element,
+        tagDefinition.vr
+      );
     }
   });
 

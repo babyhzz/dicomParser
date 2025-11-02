@@ -1,4 +1,7 @@
 import { isStringVr, punctuateTag } from "./util";
+import createJPEGBasicOffsetTable from "./createJPEGBasicOffsetTable";
+import readEncapsulatedImageFrame from "../readEncapsulatedImageFrame";
+import sharedCopy from "../sharedCopy";
 
 export default function elementToValue(dataSet, element, vr) {
   if (dataSet === undefined || element === undefined) {
@@ -30,51 +33,61 @@ function explicitElementToValue(dataSet, element) {
   if (element.vr === undefined) {
     throw "dicomParser.explicitElementToString: cannot convert implicit element to string";
   }
-  var vr = element.vr;
-  var tag = element.tag;
-
-  var textResult;
+  const vr = element.vr;
+  const tag = element.tag;
 
   function multiElementToArray(numItems, func) {
-    const result = [];
-
-    for (var i = 0; i < numItems; i++) {
-      result.push(func.call(dataSet, tag, i));
+    if (numItems === 1) {
+      return func.call(dataSet, tag, 0);
     }
 
-    return result;
+    const value = [];
+    for (var i = 0; i < numItems; i++) {
+      value.push(func.call(dataSet, tag, i));
+    }
+
+    return value;
   }
 
+  // TODO 待完善情况
   if (element.tag === 'x7fe00010') {
-    // Pixel Data special handling: return raw byte array
+    if (element.encapsulatedPixelData) {
+      const numFrames = dataSet.intString('x00280008') || 1;
+      const basicOffsetTable = createJPEGBasicOffsetTable(dataSet, element);
+      const value = [];
+      for(let frame = 0; frame < numFrames; frame++) {
+        value.push(readEncapsulatedImageFrame(dataSet, element, frame, basicOffsetTable));
+      }
+      return value;
+    } else {
+      return sharedCopy(dataSet.byteArray, element.dataOffset, element.length);
+    }
   } else if (isStringVr(vr) === true) {
-    textResult = dataSet.string(tag);
+    return dataSet.string(tag);
   } else if (vr === "AT") {
-    textResult = punctuateTag(dataSet.attributeTag(tag));
+    return punctuateTag(dataSet.attributeTag(tag));
   } else if (vr === "US") {
-    textResult = multiElementToArray(element.length / 2, dataSet.uint16);
+    return multiElementToArray(element.length / 2, dataSet.uint16);
   } else if (vr === "SS") {
-    textResult = multiElementToArray(element.length / 2, dataSet.int16);
+    return multiElementToArray(element.length / 2, dataSet.int16);
   } else if (vr === "UL") {
-    textResult = multiElementToArray(element.length / 4, dataSet.uint32);
+    return multiElementToArray(element.length / 4, dataSet.uint32);
   } else if (vr === "SL") {
-    textResult = multiElementToArray(element.length / 4, dataSet.int32);
+    return multiElementToArray(element.length / 4, dataSet.int32);
   } else if (vr === "FD") {
-    textResult = multiElementToArray(element.length / 8, dataSet.double);
+    return multiElementToArray(element.length / 8, dataSet.double);
   } else if (vr === "FL") {
-    textResult = multiElementToArray(element.length / 4, dataSet.float);
-  } 
-  // TODO  
-  // else if (
-  //   vr === "OB" ||
-  //   vr === "OW" ||
-  //   vr === "OF" ||
-  //   vr === "OD" ||
-  //   vr === "OL" ||
-  //   vr === "OV"
-  // ) {
-  //   textResult = "<binary data>";
-  // }
+    return multiElementToArray(element.length / 4, dataSet.float);
+  } else if (
+    vr === "OB" ||
+    vr === "OW" ||
+    vr === "OF" ||
+    vr === "OD" ||
+    vr === "OL" ||
+    vr === "OV"
+  ) {
+    return sharedCopy(dataSet.byteArray, element.dataOffset, element.length);
+  }
 
-  return textResult;
+  return undefined;
 }
