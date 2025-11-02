@@ -1,4 +1,5 @@
 import elementToString from "./elementToString";
+import elementToValue from "./elementToValue";
 import { lookupDicomTag, punctuateTag } from "./util";
 
 function getElementVR(dataSet, element, tagDefinition) {
@@ -36,16 +37,11 @@ export function dataSetToTree(dataSet, dictionary) {
 
   const result = [];
 
-  const keys = [];
-  for (let propertyName in dataSet.elements) {
-    keys.push(propertyName);
-  }
+  const keys = Object.keys(dataSet.elements);
   keys.sort();
 
-  for (let k = 0; k < keys.length; k++) {
-    var propertyName = keys[k];
-    var element = dataSet.elements[propertyName];
-
+  keys.forEach((key) => {
+    const element = dataSet.elements[key];
     const tagDefinition = lookupDicomTag(element.tag, dictionary);
 
     const tagInfo = {
@@ -65,7 +61,39 @@ export function dataSetToTree(dataSet, dictionary) {
     }
 
     result.push(tagInfo);
-  }
+  });
 
   return result;
+}
+
+export function dataSetToObject(dataSet, dictionary) {
+  if (dataSet === undefined) {
+    throw "dicomParser.dataSetToTree: missing required parameter: dataSet";
+  }
+
+  if (dictionary === undefined) {
+    throw "dicomParser.dataSetToTree: missing required parameter: dictionary";
+  }
+
+  const dicomObj = {};
+
+  Object.keys(dataSet.elements).forEach((key) => {
+    const element = dataSet.elements[key];
+    const tagDefinition = lookupDicomTag(element.tag, dictionary);
+
+    if (!tagDefinition || !tagDefinition.name) {
+      return;
+    }
+
+    const propertyName = tagDefinition.name;
+    if (element.items) {
+      dicomObj[propertyName] = element.items.map((item) =>
+        dataSetToObject(item.dataSet, dictionary)
+      );
+    } else {
+      dicomObj[propertyName] = elementToValue(dataSet, element, tagDefinition.vr);
+    }
+  });
+
+  return dicomObj;
 }
