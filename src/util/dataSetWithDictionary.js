@@ -31,7 +31,7 @@ function getElementVR(dataSet, element, tagDefinition) {
   return vr;
 }
 
-export function dataSetToTree(dataSet, dictionary) {
+export function dataSetToTree(dataSet, dictionary, parentKey = '') {
   if (dataSet === undefined) {
     throw "dicomParser.dataSetToTree: missing required parameter: dataSet";
   }
@@ -50,6 +50,7 @@ export function dataSetToTree(dataSet, dictionary) {
     const tagDefinition = lookupDicomTag(element.tag, dictionary);
 
     const tagInfo = {
+      key: `${parentKey}${element.tag}`,
       tag: punctuateTag(element.tag),
       vr: getElementVR(dataSet, element, tagDefinition),
       name: tagDefinition?.name || "Unknown Element",
@@ -57,9 +58,10 @@ export function dataSetToTree(dataSet, dictionary) {
 
     if (element.items) {
       tagInfo.children = element.items.map((item, index) => ({
+        key: `${tagInfo.key}[${index}]`,
         tag: punctuateTag(item.tag),
         name: `Item #${index}`,
-        children: dataSetToTree(item.dataSet, dictionary),
+        children: dataSetToTree(item.dataSet, dictionary, `${tagInfo.key}[${index}]`),
       }));
     } else if (tagInfo.vr) {
       tagInfo.value = elementToString(dataSet, element, tagInfo.vr);
@@ -90,7 +92,6 @@ export function dataSetToJson(dataSet, dictionary) {
       return;
     }
 
-    // TODO: 有些没有value，如分隔符等，暂时忽略
     if (
       element.tag === "xfffee000" ||
       element.tag === "xfffee00d" ||
