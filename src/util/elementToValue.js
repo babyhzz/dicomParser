@@ -49,21 +49,20 @@ function explicitElementToValue(dataSet, element) {
     return value;
   }
 
-  // TODO 待完善情况
-  if (element.tag === 'x7fe00010') {
+  if (element.tag === "x7fe00010") {
     if (element.encapsulatedPixelData) {
-      const numFrames = dataSet.intString('x00280008') || 1;
+      const numFrames = dataSet.intString("x00280008") || 1;
       const basicOffsetTable = createJPEGBasicOffsetTable(dataSet, element);
       const value = [];
-      for(let frame = 0; frame < numFrames; frame++) {
-        value.push(readEncapsulatedImageFrame(dataSet, element, frame, basicOffsetTable));
+      for (let frame = 0; frame < numFrames; frame++) {
+        value.push(
+          readEncapsulatedImageFrame(dataSet, element, frame, basicOffsetTable)
+        );
       }
       return value;
     } else {
       return sharedCopy(dataSet.byteArray, element.dataOffset, element.length);
     }
-  } else if (isStringVr(vr) === true) {
-    return dataSet.string(tag);
   } else if (vr === "AT") {
     return punctuateTag(dataSet.attributeTag(tag));
   } else if (vr === "US") {
@@ -78,6 +77,18 @@ function explicitElementToValue(dataSet, element) {
     return multiElementToArray(element.length / 8, dataSet.double);
   } else if (vr === "FL") {
     return multiElementToArray(element.length / 4, dataSet.float);
+  } else if (vr === "DS") {
+    return multiElementToArray(
+      dataSet.numStringValues(element.tag),
+      dataSet.floatString
+    );
+  } else if (vr === "IS") {
+    return multiElementToArray(
+      dataSet.numStringValues(element.tag),
+      dataSet.intString
+    );
+  } else if (isStringVr(vr) === true) {
+    return dataSet.string(tag);
   } else if (
     vr === "OB" ||
     vr === "OW" ||

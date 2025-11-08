@@ -91,6 +91,13 @@ export function dataSetToJson(dataSet, dictionary) {
     }
 
     // TODO: 有些没有value，如分隔符等，暂时忽略
+    if (
+      element.tag === "xfffee000" ||
+      element.tag === "xfffee00d" ||
+      element.tag === "xfffee0dd"
+    ) {
+      return;
+    }
 
     const propertyName = tagDefinition.name;
     if (element.items) {
