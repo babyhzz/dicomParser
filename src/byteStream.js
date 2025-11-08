@@ -30,8 +30,7 @@ export default class ByteStream {
       throw "dicomParser.ByteStream: missing required parameter 'byteArray'";
     }
     if (
-      byteArray instanceof Uint8Array === false &&
-      (typeof Buffer === "undefined" || byteArray instanceof Buffer === false)
+      byteArray instanceof Uint8Array === false
     ) {
       throw "dicomParser.ByteStream: parameter byteArray is not of type Uint8Array or Buffer";
     }

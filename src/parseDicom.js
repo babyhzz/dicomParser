@@ -1,10 +1,8 @@
-import alloc from "./alloc.js";
 import bigEndianByteArrayParser from "./bigEndianByteArrayParser.js";
 import ByteStream from "./byteStream.js";
 import DataSet from "./dataSet.js";
 import littleEndianByteArrayParser from "./littleEndianByteArrayParser.js";
 import readPart10Header from "./readPart10Header.js";
-import sharedCopy from "./sharedCopy.js";
 import * as byteArrayParser from "./byteArrayParser.js";
 import * as parseDicomDataSet from "./parseDicomDataSet.js";
 
@@ -33,14 +31,14 @@ const BEI = "1.2.840.10008.1.2.2";
 export default function parseDicom(byteArray, options = {}) {
   if (byteArray === undefined) {
     throw new Error(
-      "dicomParser.parseDicom: missing required parameter 'byteArray'",
+      "dicomParser.parseDicom: missing required parameter 'byteArray'"
     );
   }
 
   const readTransferSyntax = (metaHeaderDataSet) => {
     if (metaHeaderDataSet.elements.x00020010 === undefined) {
       throw new Error(
-        "dicomParser.parseDicom: missing required meta header attribute 0002,0010",
+        "dicomParser.parseDicom: missing required meta header attribute 0002,0010"
       );
     }
 
@@ -50,7 +48,7 @@ export default function parseDicom(byteArray, options = {}) {
       byteArrayParser.readFixedString(
         byteArray,
         transferSyntaxElement.dataOffset,
-        transferSyntaxElement.length,
+        transferSyntaxElement.length
       )
     );
   };
@@ -66,12 +64,6 @@ export default function parseDicom(byteArray, options = {}) {
   }
 
   function getDataSetByteStream(transferSyntax, position) {
-    // Detect whether we are inside a browser or Node.js
-    const isNode =
-      Object.prototype.toString.call(
-        typeof process !== "undefined" ? process : 0,
-      ) === "[object process]";
-
     if (transferSyntax === "1.2.840.10008.1.2.1.99") {
       // if an infalter callback is registered, use it
       if (options && options.inflater) {
@@ -80,50 +72,8 @@ export default function parseDicom(byteArray, options = {}) {
         return new ByteStream(
           littleEndianByteArrayParser,
           fullByteArrayCallback,
-          0,
+          0
         );
-      }
-      // if running on node, use the zlib library to inflate
-      // http://stackoverflow.com/questions/4224606/how-to-check-whether-a-script-is-running-under-node-js
-      else if (isNode === true) {
-        // inflate it
-        const zlib = require("zlib");
-        const deflatedBuffer = sharedCopy(
-          byteArray,
-          position,
-          byteArray.length - position,
-        );
-        const inflatedBuffer = zlib.inflateRawSync(deflatedBuffer);
-
-        // create a single byte array with the full header bytes and the inflated bytes
-        const fullByteArrayBuffer = alloc(
-          byteArray,
-          inflatedBuffer.length + position,
-        );
-
-        byteArray.copy(fullByteArrayBuffer, 0, 0, position);
-        inflatedBuffer.copy(fullByteArrayBuffer, position);
-
-        return new ByteStream(
-          littleEndianByteArrayParser,
-          fullByteArrayBuffer,
-          0,
-        );
-      }
-      // if pako is defined - use it.  This is the web browser path
-      // https://github.com/nodeca/pako
-      else if (typeof pako !== "undefined") {
-        // inflate it
-        const deflated = byteArray.slice(position);
-        const inflated = pako.inflateRaw(deflated);
-
-        // create a single byte array with the full header bytes and the inflated bytes
-        const fullByteArray = alloc(byteArray, inflated.length + position);
-
-        fullByteArray.set(byteArray.slice(0, position), 0);
-        fullByteArray.set(inflated, position);
-
-        return new ByteStream(littleEndianByteArrayParser, fullByteArray, 0);
       }
 
       // throw exception since no inflater is available
@@ -142,7 +92,12 @@ export default function parseDicom(byteArray, options = {}) {
 
   function mergeDataSets(metaHeaderDataSet, instanceDataSet) {
     for (const propertyName in metaHeaderDataSet.elements) {
-      if (metaHeaderDataSet.elements.hasOwnProperty(propertyName)) {
+      if (
+        Object.prototype.hasOwnProperty.call(
+          metaHeaderDataSet.elements,
+          propertyName
+        )
+      ) {
         instanceDataSet.elements[propertyName] =
           metaHeaderDataSet.elements[propertyName];
       }
@@ -150,7 +105,7 @@ export default function parseDicom(byteArray, options = {}) {
 
     if (metaHeaderDataSet.warnings !== undefined) {
       instanceDataSet.warnings = metaHeaderDataSet.warnings.concat(
-        instanceDataSet.warnings,
+        instanceDataSet.warnings
       );
     }
 
@@ -162,14 +117,14 @@ export default function parseDicom(byteArray, options = {}) {
     const explicit = isExplicit(transferSyntax);
     const dataSetByteStream = getDataSetByteStream(
       transferSyntax,
-      metaHeaderDataSet.position,
+      metaHeaderDataSet.position
     );
 
     const elements = {};
     const dataSet = new DataSet(
       dataSetByteStream.byteArrayParser,
       dataSetByteStream.byteArray,
-      elements,
+      elements
     );
 
     dataSet.warnings = dataSetByteStream.warnings;
@@ -180,14 +135,14 @@ export default function parseDicom(byteArray, options = {}) {
           dataSet,
           dataSetByteStream,
           dataSetByteStream.byteArray.length,
-          options,
+          options
         );
       } else {
         parseDicomDataSet.parseDicomDataSetImplicit(
           dataSet,
           dataSetByteStream,
           dataSetByteStream.byteArray.length,
-          options,
+          options
         );
       }
     } catch (e) {

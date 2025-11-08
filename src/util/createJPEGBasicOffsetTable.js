@@ -85,6 +85,7 @@ export default function createJPEGBasicOffsetTable(
 
   var startFragmentIndex = 0;
 
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     // Add the offset for the start fragment
     basicOffsetTable.push(

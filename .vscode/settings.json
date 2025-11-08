@@ -1,5 +1,4 @@
 {
-  "eslint.enable": false,
   "prettier.printWidth": 80,
   "cSpell.words": [
     "DICM",
